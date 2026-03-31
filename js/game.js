@@ -11,7 +11,7 @@ import { spawnConfetti } from './confetti.js';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const IMAGE_BASE_PATH = './';
+const IMAGE_BASE_PATH = './images/';
 const HS_KEY          = 'umoja_highscore';
 
 // ─── DOM refs (cached once at startup) ───────────────────────────────────────
