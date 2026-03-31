@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Umoja Fun Food Fact Matcher</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      #umoja-game-container {
+        --primary-color: #ffb703;
+        --bg-color: #8ecae6;
+        --card-bg: #ffffff;
+        --card-back: #219ebc;
+        --text-color: #023047;
+        --shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+
+        font-family: "Fredoka", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 20px;
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      #umoja-game-container h2.game-title {
+        font-size: 3rem;
+        color: #fb8500;
+        text-shadow: 2px 2px 0px #fff;
+        margin-top: 0;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      #umoja-game-container .stats {
+        display: flex;
+        gap: 20px;
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 10px 25px;
+        border-radius: 50px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      #umoja-game-container .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+#umoja-game-container .streak-banner {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: #fb8500;
+        text-shadow: 1px 1px 0 #fff;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        transition: opacity 0.4s;
+      }
+
+      #umoja-game-container .game-board {
+        display: grid;
+        gap: clamp(8px, 2vw, 15px);
+        justify-content: center;
+        width: 100%;
+      }
+
+      #umoja-game-container .card {
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        min-width: 0;
+        perspective: 1000px;
+        cursor: pointer;
+      }
+
+      #umoja-game-container .card-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1.3);
+        transform-style: preserve-3d;
+        border-radius: 15px;
+        box-shadow: var(--shadow);
+      }
+
+      #umoja-game-container .card.flipped .card-inner {
+        transform: rotateY(180deg);
+      }
+
+      #umoja-game-container .card.matched .card-inner {
+        transform: rotateY(180deg);
+        animation: matchPop 0.5s ease forwards;
+        box-shadow: 0 0 0 4px #2dc653, 0 8px 20px rgba(45, 198, 83, 0.4);
+      }
+
+      @keyframes matchPop {
+        0%   { transform: rotateY(180deg) scale(1); }
+        40%  { transform: rotateY(180deg) scale(1.12); }
+        70%  { transform: rotateY(180deg) scale(0.96); }
+        100% { transform: rotateY(180deg) scale(1); }
+      }
+
+      #umoja-game-container .card.shake .card-inner {
+        animation: shake 0.5s ease;
+      }
+
+      @keyframes shake {
+        0%   { transform: rotateY(180deg) translateX(0); }
+        20%  { transform: rotateY(180deg) translateX(-8px) rotate(-2deg); }
+        40%  { transform: rotateY(180deg) translateX(8px) rotate(2deg); }
+        60%  { transform: rotateY(180deg) translateX(-6px) rotate(-1deg); }
+        80%  { transform: rotateY(180deg) translateX(6px) rotate(1deg); }
+        100% { transform: rotateY(180deg) translateX(0); }
+      }
+
+      #umoja-game-container .card-face {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-sizing: border-box;
+      }
+
+      #umoja-game-container .card-back {
+        background: linear-gradient(145deg, #023047 0%, #219ebc 55%, #023047 100%);
+        border: 4px solid #ffb703;
+        overflow: hidden;
+        flex-direction: column;
+        gap: 6px;
+        transition: filter 0.2s;
+      }
+
+      /* polka-dot pattern overlay */
+      #umoja-game-container .card-back::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1.5px, transparent 1.5px);
+        background-size: 18px 18px;
+        pointer-events: none;
+      }
+
+      /* inner decorative border */
+      #umoja-game-container .card-back::before {
+        content: '';
+        position: absolute;
+        inset: 7px;
+        border: 2px solid rgba(255, 183, 3, 0.5);
+        border-radius: 7px;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      #umoja-game-container .card-back-icon {
+        font-size: clamp(1.8rem, 5vw, 2.6rem);
+        z-index: 2;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+        line-height: 1;
+      }
+
+      #umoja-game-container .card-back-label {
+        font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+        font-weight: 600;
+        color: #ffb703;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        z-index: 2;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      }
+
+      #umoja-game-container .card:hover:not(.flipped):not(.matched) .card-back {
+        filter: brightness(1.15);
+      }
+
+      /* Card front — trading-card style frame */
+      #umoja-game-container .card-front {
+        transform: rotateY(180deg);
+        flex-direction: column;
+        padding: 0;
+        overflow: hidden;
+        background: #fff;
+        border: 4px solid #ffb703;
+        outline: 3px solid #fb8500;
+        outline-offset: -7px;
+      }
+
+      /* Image area */
+      #umoja-game-container .card-img-area {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 10px 6px;
+        box-sizing: border-box;
+        background: linear-gradient(160deg, #fffbf0 0%, #fff8e1 100%);
+      }
+
+      #umoja-game-container .card-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+      }
+
+      /* Bottom banner — shared base */
+      #umoja-game-container .card-banner {
+        width: 100%;
+        font-weight: 600;
+        text-align: center;
+        padding: 6px 8px;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        white-space: normal;
+        line-height: 1.3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Name variant — gold, single line */
+      #umoja-game-container .card-banner.name {
+        background: #ffb703;
+        color: #023047;
+        font-size: clamp(0.7rem, 2.2vw, 0.95rem);
+        letter-spacing: 0.3px;
+        min-height: 2.4em;
+      }
+
+      /* Fact variant — teal, up to 3 lines */
+      #umoja-game-container .card-banner.fact {
+        background: #219ebc;
+        color: #fff;
+        font-size: clamp(0.55rem, 1.6vw, 0.72rem);
+        flex: 0 0 38%;
+        overflow: hidden;
+      }
+
+      /* Confetti */
+      #umoja-game-container .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        pointer-events: none;
+        animation: confettiFall linear forwards;
+        z-index: 50;
+      }
+
+      @keyframes confettiFall {
+        0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+      }
+
+      /* Overlay */
+      #umoja-game-container .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(2, 48, 71, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+        z-index: 100;
+        border-radius: 20px;
+      }
+
+      #umoja-game-container .overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      #umoja-game-container .overlay-content {
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        max-width: 90%;
+        width: 420px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      #umoja-game-container .overlay h3 {
+        font-size: 2.5rem;
+        color: #fb8500;
+        margin-top: 0;
+        margin-bottom: 10px;
+      }
+
+      #umoja-game-container .overlay p {
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+      }
+
+      #umoja-game-container .stars {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        letter-spacing: 4px;
+      }
+
+      #umoja-game-container .score-summary {
+        background: #f0f9ff;
+        border-radius: 10px;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+        font-size: 1rem;
+        line-height: 1.8;
+        text-align: left;
+      }
+
+      #umoja-game-container .score-summary strong {
+        color: #fb8500;
+      }
+
+      #umoja-game-container button.game-btn {
+        background-color: #fb8500;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.5rem;
+        font-family: "Fredoka", sans-serif;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: transform 0.2s, background 0.2s;
+        box-shadow: 0 5px 0 #e85d04;
+      }
+
+      #umoja-game-container button.game-btn:hover {
+        transform: translateY(-2px);
+        background-color: #ff9e00;
+      }
+
+      #umoja-game-container button.game-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #e85d04;
+      }
+
+/* ── Fluid type on card text ── */
+      #umoja-game-container .card-text {
+        font-size: clamp(0.6rem, 2.2vw, 0.95rem);
+        line-height: 1.35;
+        color: var(--text-color);
+        font-weight: 600;
+      }
+
+      /* ── Tablet ── */
+      @media (max-width: 900px) {
+        #umoja-game-container {
+          padding: 24px 14px;
+        }
+        #umoja-game-container h2.game-title {
+          font-size: 2.2rem;
+        }
+      }
+
+      /* ── Mobile ── */
+      @media (max-width: 600px) {
+        #umoja-game-container {
+          padding: 16px 10px;
+          border-radius: 14px;
+        }
+        #umoja-game-container h2.game-title {
+          font-size: 1.6rem;
+          margin-bottom: 8px;
+        }
+        #umoja-game-container .stats {
+          font-size: 1rem;
+          gap: 10px;
+          padding: 8px 16px;
+          margin-bottom: 10px;
+        }
+        #umoja-game-container .streak-banner {
+          font-size: 1.3rem;
+          height: 30px;
+          margin-bottom: 6px;
+        }
+        #umoja-game-container .game-board {
+          gap: 8px;
+        }
+        #umoja-game-container .overlay-content {
+          padding: 24px 18px;
+        }
+        #umoja-game-container .overlay h3 {
+          font-size: 1.8rem;
+        }
+        #umoja-game-container .overlay p {
+          font-size: 1rem;
+        }
+        #umoja-game-container button.game-btn {
+          padding: 12px 22px;
+          font-size: 1.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="umoja-game-container">
+      <h2 class="game-title">🧠 Fact Matcher! 🍎</h2>
+
+      <div class="stats">
+        <div class="stat-item">Level: <span id="level-display">1</span></div>
+        <div class="stat-item">
+          Matches: <span id="match-display">0</span>/<span id="total-matches">3</span>
+        </div>
+        <div class="stat-item">⭐ <span id="score-display">0</span></div>
+      </div>
+
+      <div class="streak-banner" id="streak-banner"></div>
+
+      <div class="game-board" id="game-board"></div>
+
+      <div class="overlay" id="overlay">
+        <div class="overlay-content">
+          <h3 id="overlay-title">Great Job! 🎉</h3>
+          <div class="stars" id="overlay-stars">⭐⭐⭐</div>
+          <p id="overlay-message">You matched all the facts!</p>
+          <div class="score-summary" id="score-summary"></div>
+          <button class="game-btn" id="next-level-btn">Next Level!</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const imageBasePath = "./";
+
+        const allCharacters = [
+          { id: 1,  name: "Almond",       image: "almond.png",       fact: "25 almonds = a full serving of protein!" },
+          { id: 2,  name: "Kidney Bean",  image: "bean-V2.png",      fact: "Great source of iron & fiber!" },
+          { id: 3,  name: "Blueberry",    image: "blueberry.png",    fact: "Boosts brain power & memory!" },
+          { id: 4,  name: "Cheese",       image: "cheese.png",       fact: "Loaded with calcium for strong bones!" },
+          { id: 5,  name: "Cotton Candy", image: "cotton-candy.png", fact: "It's 100% sugar, but mostly made of air!" },
+          { id: 6,  name: "Kale",         image: "kale.png",         fact: "More vitamin C than an orange!" },
+          { id: 7,  name: "Starfruit",    image: "starfruit.png",    fact: "Even the waxy skin is totally edible!" },
+          { id: 8,  name: "Strawberry",   image: "strawberry.png",   fact: "91% water — great for hydration!" },
+          { id: 9,  name: "Apple",        image: "apple-V2.png",     fact: "7,500+ varieties grow worldwide!" },
+          { id: 10, name: "Cauliflower",  image: "cauliflower.png",  fact: "Can become pizza crust or rice!" },
+          { id: 11, name: "Eggplant",     image: "eggplant.png",     fact: "Technically a giant berry!" },
+          { id: 12, name: "Milk",         image: "milk.png",         fact: "Helps build strong bones & teeth!" },
+          { id: 13, name: "Pudding",      image: "pudding-v2.png",   fact: "In French, boudin means sausage!" },
+          { id: 14, name: "Salmon",       image: "salmon-v2.png",    fact: "Can leap 6 feet to clear waterfalls!" },
+          { id: 15, name: "Spaghetti",    image: "spaghettit.png",   fact: "Athletes eat it for pre-race energy!" },
+          { id: 16, name: "Steak",        image: "steak.png",        fact: "Packed with protein for big muscles!" },
+          { id: 17, name: "Lollipop",     image: "sucker.png",       fact: "Coats teeth in sugar — brush after!" },
+          { id: 18, name: "Tortilla",     image: "tortilla.png",     fact: "Means 'little cake' in Spanish!" },
+        ];
+
+        const levelsInfo = [
+          { pairs: 3,  columns: 3 },
+          { pairs: 6,  columns: 4 },
+          { pairs: 10, columns: 5 },
+          { pairs: 14, columns: 7 },
+          { pairs: 18, columns: 9 },
+        ];
+
+        let currentLevelIndex = 0;
+        let matchedPairs = 0;
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let score = 0;
+        let streak = 0;
+        let levelFlips = 0;
+        let levelStartScore = 0;
+
+        // Web Audio context for sound effects
+        let audioCtx = null;
+        function getAudio() {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          return audioCtx;
+        }
+
+        function playTone(freq, type, duration, vol = 0.3) {
+          try {
+            const ctx = getAudio();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(vol, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + duration);
+          } catch(e) {}
+        }
+
+        function playFlipSound() {
+          playTone(600, 'sine', 0.08, 0.15);
+        }
+
+        function playMatchSound() {
+          playTone(523, 'sine', 0.1, 0.3);
+          setTimeout(() => playTone(659, 'sine', 0.1, 0.3), 100);
+          setTimeout(() => playTone(784, 'sine', 0.2, 0.3), 200);
+        }
+
+        function playMissSound() {
+          playTone(200, 'sawtooth', 0.3, 0.2);
+        }
+
+        function playLevelUpSound() {
+          [523,587,659,698,784].forEach((f, i) => {
+            setTimeout(() => playTone(f, 'sine', 0.2, 0.3), i * 100);
+          });
+        }
+
+        // DOM refs
+        const gameBoard        = document.getElementById("game-board");
+        const levelDisplay     = document.getElementById("level-display");
+        const matchDisplay     = document.getElementById("match-display");
+        const totalMatchesDisp = document.getElementById("total-matches");
+        const scoreDisplay     = document.getElementById("score-display");
+        const streakBanner     = document.getElementById("streak-banner");
+        const overlay          = document.getElementById("overlay");
+        const overlayTitle     = document.getElementById("overlay-title");
+        const overlayStars     = document.getElementById("overlay-stars");
+        const overlayMessage   = document.getElementById("overlay-message");
+        const scoreSummary     = document.getElementById("score-summary");
+        const nextLevelBtn     = document.getElementById("next-level-btn");
+
+        function shuffle(array) {
+          let cur = array.length, rnd;
+          while (cur !== 0) {
+            rnd = Math.floor(Math.random() * cur--);
+            [array[cur], array[rnd]] = [array[rnd], array[cur]];
+          }
+          return array;
+        }
+
+        function showStreak(n) {
+          if (n < 2) { streakBanner.textContent = ""; return; }
+          const msgs = ["", "", "🔥 2x Streak!", "🔥🔥 3x Streak!", "💥 4x Streak!", "🌟 5x Streak!", "⚡ UNSTOPPABLE!"];
+          streakBanner.textContent = msgs[Math.min(n, msgs.length - 1)] || `⚡ ${n}x Streak!`;
+          // auto-clear after 1.5s if not immediately overwritten
+          clearTimeout(streakBanner._timeout);
+          streakBanner._timeout = setTimeout(() => { streakBanner.textContent = ""; }, 1500);
+        }
+
+        function spawnConfetti(x, y, count = 18) {
+          const container = document.getElementById("umoja-game-container");
+          const colors = ["#ffb703","#fb8500","#219ebc","#2dc653","#e63946","#fff"];
+          for (let i = 0; i < count; i++) {
+            const piece = document.createElement("div");
+            piece.classList.add("confetti-piece");
+            piece.style.left = x + "px";
+            piece.style.top  = y + "px";
+            piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.width  = (6 + Math.random() * 8) + "px";
+            piece.style.height = (6 + Math.random() * 8) + "px";
+            piece.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+            const angle = (Math.random() * 360) * Math.PI / 180;
+            const dist  = 40 + Math.random() * 80;
+            piece.style.setProperty("--tx", Math.cos(angle) * dist + "px");
+            piece.style.animationDuration = (0.6 + Math.random() * 0.6) + "s";
+            piece.style.animationName = "confettiFall";
+            // override to spread outward first
+            piece.animate([
+              { transform: `translate(0,0) rotate(0deg)`, opacity: 1 },
+              { transform: `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist + 60}px) rotate(${360 + Math.random()*360}deg)`, opacity: 0 }
+            ], { duration: 700 + Math.random() * 500, easing: "ease-out", fill: "forwards" });
+            container.appendChild(piece);
+            setTimeout(() => piece.remove(), 1300);
+          }
+        }
+
+        function initLevel() {
+          matchedPairs = 0;
+          hasFlippedCard = false;
+          lockBoard = false;
+          firstCard = null;
+          secondCard = null;
+          streak = 0;
+          levelFlips = 0;
+          levelStartScore = score;
+          gameBoard.innerHTML = "";
+          streakBanner.textContent = "";
+          overlay.classList.remove("active");
+
+          const levelData = levelsInfo[currentLevelIndex];
+          levelDisplay.innerText = currentLevelIndex + 1;
+          matchDisplay.innerText = 0;
+          totalMatchesDisp.innerText = levelData.pairs;
+          scoreDisplay.innerText = score;
+
+          gameBoard.style.gridTemplateColumns = `repeat(${getColumns(levelData)}, minmax(0, 140px))`;
+          const selected = shuffle([...allCharacters]).slice(0, levelData.pairs);
+
+          let cardsArray = [];
+          selected.forEach((char) => {
+            const src = imageBasePath + char.image;
+            cardsArray.push({ id: char.id, label: char.name, bannerClass: "name", src });
+            cardsArray.push({ id: char.id, label: char.fact, bannerClass: "fact", src });
+          });
+          cardsArray = shuffle(cardsArray);
+
+          cardsArray.forEach((cardData) => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.dataset.id = cardData.id;
+
+            const frontContent = `
+              <div class="card-face card-front">
+                <div class="card-img-area">
+                  <img src="${cardData.src}" alt="${cardData.label}" class="card-image">
+                </div>
+                <div class="card-banner ${cardData.bannerClass}">${cardData.label}</div>
+              </div>`;
+
+            card.innerHTML = `
+              <div class="card-inner">
+                <div class="card-face card-back">
+                  <div class="card-back-icon">🍎</div>
+                  <div class="card-back-label">Fact Matcher</div>
+                </div>
+                ${frontContent}
+              </div>`;
+
+            card.addEventListener("click", () => flipCard(card));
+            gameBoard.appendChild(card);
+          });
+
+        }
+
+        function flipCard(card) {
+          if (lockBoard) return;
+          if (card.classList.contains("flipped") || card.classList.contains("matched")) return;
+
+          playFlipSound();
+          card.classList.add("flipped");
+          levelFlips++;
+
+          if (!hasFlippedCard) {
+            hasFlippedCard = true;
+            firstCard = card;
+            return;
+          }
+
+          secondCard = card;
+          lockBoard = true;
+          checkForMatch();
+        }
+
+        function checkForMatch() {
+          const isMatch = firstCard.dataset.id === secondCard.dataset.id;
+
+          if (isMatch) {
+            streak++;
+            const bonus = Math.max(0, streak - 1) * 25;
+            const points = 100 + bonus;
+            score += points;
+            scoreDisplay.innerText = score;
+            showStreak(streak);
+
+            // Mark as matched
+            firstCard.classList.add("matched");
+            secondCard.classList.add("matched");
+            firstCard.classList.remove("flipped");
+            secondCard.classList.remove("flipped");
+
+            matchedPairs++;
+            matchDisplay.innerText = matchedPairs;
+
+            playMatchSound();
+
+            // Confetti at each matched card's position
+            [firstCard, secondCard].forEach(c => {
+              const r = c.getBoundingClientRect();
+              const cr = document.getElementById("umoja-game-container").getBoundingClientRect();
+              spawnConfetti(r.left - cr.left + r.width/2, r.top - cr.top + r.height/2, 14);
+            });
+
+            resetBoard();
+
+            if (matchedPairs === levelsInfo[currentLevelIndex].pairs) {
+              setTimeout(levelComplete, 700);
+            }
+          } else {
+            streak = 0;
+            showStreak(0);
+            playMissSound();
+
+            // Shake both cards
+            firstCard.classList.add("shake");
+            secondCard.classList.add("shake");
+            setTimeout(() => {
+              firstCard.classList.remove("shake", "flipped");
+              secondCard.classList.remove("shake", "flipped");
+              resetBoard();
+            }, 600);
+          }
+        }
+
+        function resetBoard() {
+          [hasFlippedCard, lockBoard] = [false, false];
+          [firstCard, secondCard] = [null, null];
+        }
+
+        function levelComplete() {
+          playLevelUpSound();
+
+          // Flood with confetti
+          const container = document.getElementById("umoja-game-container");
+          for (let i = 0; i < 6; i++) {
+            setTimeout(() => {
+              const x = Math.random() * container.offsetWidth;
+              spawnConfetti(x, 50 + Math.random() * 100, 25);
+            }, i * 200);
+          }
+
+          const pairs = levelsInfo[currentLevelIndex].pairs;
+          const perfect = pairs * 2;
+          const ratio = perfect / levelFlips;
+          let stars;
+          if (ratio >= 0.85)      stars = "⭐⭐⭐";
+          else if (ratio >= 0.6)  stars = "⭐⭐";
+          else                    stars = "⭐";
+
+          overlayStars.innerText = stars;
+          scoreSummary.innerHTML =
+            `<strong>Matches:</strong> ${pairs} / ${pairs}<br>` +
+            `<strong>Flips used:</strong> ${levelFlips}<br>` +
+            `<strong>Level score:</strong> ${score - levelStartScore} pts`;
+
+          if (currentLevelIndex < levelsInfo.length - 1) {
+            overlayTitle.innerText = "Great Job! 🎉";
+            overlayMessage.innerText = "You found all the matches! Ready for more?";
+            nextLevelBtn.innerText = "Next Level →";
+            nextLevelBtn.onclick = () => { currentLevelIndex++; initLevel(); };
+          } else {
+            overlayTitle.innerText = "You Won! 🏆";
+            overlayMessage.innerText = "You are a Food Fact Master! Total score:";
+            scoreSummary.innerHTML = `<strong>Final Score: ${score} pts!</strong>`;
+            nextLevelBtn.innerText = "Play Again";
+            nextLevelBtn.onclick = () => { currentLevelIndex = 0; score = 0; scoreDisplay.innerText = 0; initLevel(); };
+          }
+
+          overlay.classList.add("active");
+        }
+
+        function getColumns(levelData) {
+          const w = window.innerWidth;
+          if (w <= 400) return Math.min(3, levelData.columns);
+          if (w <= 600) return Math.min(4, levelData.columns);
+          if (w <= 900) return Math.min(5, levelData.columns);
+          return levelData.columns;
+        }
+
+        window.addEventListener("resize", () => {
+          gameBoard.style.gridTemplateColumns = `repeat(${getColumns(levelsInfo[currentLevelIndex])}, minmax(0, 140px))`;
+        });
+
+        initLevel();
+      })();
+    </script>
+  </body>
+</html>
