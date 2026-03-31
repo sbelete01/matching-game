@@ -1,0 +1,478 @@
+/* ─── Reset ──────────────────────────────────────────────────────────────────── */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #071c26;
+}
+
+/* ─── Design tokens ──────────────────────────────────────────────────────────── */
+
+#umoja-game-container {
+  --vq-bg-dark:       #071c26;
+  --vq-primary-dark:  #063748;
+  --vq-teal:          #00a89c;
+  --vq-teal-light:    #08c4b4;
+  --vq-teal-shadow:   #006b62;
+  --vq-teal-50:       rgba(0, 168, 156, 0.5);
+  --vq-gold:          #fdbf0f;
+  --vq-green:         #4caf50;
+  --vq-red:           #ff5252;
+  --vq-white:         #ffffff;
+  --vq-font:          "Fredoka", sans-serif;
+  --vq-btn-gradient:  linear-gradient(180deg, #08c4b4 0%, #00a89c 40%, #00877e 100%);
+  --vq-btn-shadow:    0 6px 0 0 #006b62, 0 8px 20px rgba(0,0,0,0.35), inset 0 2px 0 rgba(255,255,255,0.25);
+  --vq-btn-text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  --vq-panel-bg:      rgba(6, 55, 72, 0.85);
+  --vq-radius-pill:   50px;
+  --vq-radius-card:   12px;
+
+  font-family: var(--vq-font);
+  background-color: var(--vq-bg-dark);
+  color: var(--vq-white);
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  border-radius: 0;
+  z-index: 1;
+}
+
+/* ─── Starfield background ───────────────────────────────────────────────────── */
+/* Stars are spread across the full width (0–95% horizontal) */
+
+#umoja-game-container::before,
+#umoja-game-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+#umoja-game-container::before {
+  background-image:
+    radial-gradient(1.5px 1.5px at  7% 12%, #ffffff 50%, transparent 100%),
+    radial-gradient(1px   1px   at 35% 68%, #c8d8ff 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 55% 34%, #ffffff 50%, transparent 100%),
+    radial-gradient(1px   1px   at 80% 85%, #ffe8c0 50%, transparent 100%),
+    radial-gradient(2px   2px   at 92%  5%, #ffffff 50%, transparent 100%),
+    radial-gradient(1px   1px   at 68% 48%, #c8d8ff 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 45% 92%, #ffffff 50%, transparent 100%),
+    radial-gradient(1px   1px   at 25% 22%, #ffe8c0 50%, transparent 100%),
+    radial-gradient(1px   1px   at 72% 15%, #ffffff 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 88% 60%, #c8d8ff 50%, transparent 100%);
+  animation: starTwinkle1 8s ease-in-out infinite alternate;
+}
+
+#umoja-game-container::after {
+  background-image:
+    radial-gradient(1px   1px   at 15% 28%, #ffffff 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 40% 52%, #ffe8c0 50%, transparent 100%),
+    radial-gradient(1px   1px   at 62%  8%, #c8d8ff 50%, transparent 100%),
+    radial-gradient(1px   1px   at 95% 95%, #ffffff 50%, transparent 100%),
+    radial-gradient(2px   2px   at 78% 45%, #ffffff 50%, transparent 100%),
+    radial-gradient(1px   1px   at 50% 75%, #ffe8c0 50%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 30% 40%, #ffffff 50%, transparent 100%),
+    radial-gradient(1px   1px   at 85% 30%, #c8d8ff 50%, transparent 100%);
+  animation: starTwinkle2 10s ease-in-out infinite alternate;
+}
+
+@keyframes starTwinkle1 {
+  from { opacity: 0.5; }
+  to   { opacity: 0.9; }
+}
+
+@keyframes starTwinkle2 {
+  from { opacity: 0.3; }
+  to   { opacity: 0.65; }
+}
+
+/* ─── Title ──────────────────────────────────────────────────────────────────── */
+
+#umoja-game-container h2.game-title {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  color: #ffffff;
+  text-shadow:
+    0 3px 0 #0a5e6e,
+    0 6px 0 #074550,
+    0 8px 16px rgba(0,0,0,0.35),
+    0 0 40px rgba(0, 168, 156, 0.5);
+  letter-spacing: 2px;
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-align: center;
+  animation: titleFloat 2.5s ease-in-out infinite alternate;
+}
+
+/* FIX: was translatey (lowercase y) — CSS transforms are case-sensitive */
+@keyframes titleFloat {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-4px); }
+}
+
+/* ─── Stats bar ──────────────────────────────────────────────────────────────── */
+
+#umoja-game-container .stats {
+  display: flex;
+  gap: 20px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  background: var(--vq-panel-bg);
+  border: 2px solid var(--vq-teal-50);
+  padding: 10px 25px;
+  border-radius: var(--vq-radius-pill);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#umoja-game-container .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ─── Streak banner ──────────────────────────────────────────────────────────── */
+
+#umoja-game-container .streak-banner {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--vq-gold);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  transition: opacity 0.4s;
+}
+
+/* ─── Game board ─────────────────────────────────────────────────────────────── */
+
+#umoja-game-container .game-board {
+  display: grid;
+  gap: clamp(8px, 2vw, 15px);
+  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
+}
+
+/* ─── Card shell ─────────────────────────────────────────────────────────────── */
+
+#umoja-game-container .card {
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  min-width: 0;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+#umoja-game-container .card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1.3);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  border-radius: var(--vq-radius-card);
+}
+
+#umoja-game-container .card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+#umoja-game-container .card.matched .card-inner {
+  transform: rotateY(180deg);
+  animation: matchPop 0.5s ease forwards;
+  box-shadow: 0 0 0 4px var(--vq-green), 0 8px 20px rgba(76,175,80,0.4);
+}
+
+@keyframes matchPop {
+  0%   { transform: rotateY(180deg) scale(1); }
+  40%  { transform: rotateY(180deg) scale(1.12); }
+  70%  { transform: rotateY(180deg) scale(0.96); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+
+#umoja-game-container .card.shake .card-inner {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%   { transform: rotateY(180deg) translateX(0); }
+  20%  { transform: rotateY(180deg) translateX(-8px) rotate(-2deg); }
+  40%  { transform: rotateY(180deg) translateX(8px) rotate(2deg); }
+  60%  { transform: rotateY(180deg) translateX(-6px) rotate(-1deg); }
+  80%  { transform: rotateY(180deg) translateX(6px) rotate(1deg); }
+  100% { transform: rotateY(180deg) translateX(0); }
+}
+
+/* ─── Card faces ─────────────────────────────────────────────────────────────── */
+
+#umoja-game-container .card-face {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--vq-radius-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Back face */
+#umoja-game-container .card-back {
+  background: linear-gradient(160deg, #2a2f35 0%, #33383e 50%, #2a2f35 100%);
+  border: 3px solid rgba(255,255,255,0.15);
+  overflow: hidden;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.25s ease, filter 0.25s ease;
+}
+
+#umoja-game-container .card-back-icon {
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  z-index: 2;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  opacity: 0.8;
+}
+
+#umoja-game-container .card:hover:not(.flipped):not(.matched) .card-back {
+  filter: brightness(1.25);
+  border-color: rgba(255,255,255,0.3);
+}
+
+/* iOS Safari fix: force back face invisible when card is flipped */
+#umoja-game-container .card.flipped .card-back,
+#umoja-game-container .card.matched .card-back {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Front face */
+#umoja-game-container .card-front {
+  transform: rotateY(180deg);
+  flex-direction: column;
+  padding: 4px;
+  overflow: hidden;
+  background: linear-gradient(160deg, #3d2000 0%, #6a3a00 40%, #8a5a10 100%);
+  border: 3px solid var(--vq-gold);
+  box-shadow: 0 0 20px rgba(253,191,15,0.25), inset 0 0 20px rgba(253,191,15,0.08);
+}
+
+#umoja-game-container .card-img-area {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, #fffbf0 0%, #fff8e1 100%);
+  border-radius: 6px 6px 0 0;
+}
+
+#umoja-game-container .card-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+}
+
+/* ─── Card banners ───────────────────────────────────────────────────────────── */
+
+#umoja-game-container .card-banner {
+  width: 100%;
+  font-weight: 700;
+  text-align: center;
+  padding: 8px 6px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  white-space: normal;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 6px 6px;
+  color: var(--vq-primary-dark);
+}
+
+#umoja-game-container .card-banner.name {
+  background: var(--vq-gold);
+  font-size: clamp(0.7rem, 2.2vw, 1rem);
+  min-height: 2.4em;
+}
+
+#umoja-game-container .card-banner.fact {
+  background: var(--vq-teal-light);
+  color: #fff;
+  font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+  flex: 0 0 40%;
+  overflow: hidden;
+}
+
+/* ─── Confetti particles ─────────────────────────────────────────────────────── */
+/* NOTE: animation is handled by the Web Animations API in confetti.js — no keyframes needed here */
+
+#umoja-game-container .confetti-piece {
+  position: absolute;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ─── Overlay ────────────────────────────────────────────────────────────────── */
+
+#umoja-game-container .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 28, 38, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 100;
+}
+
+#umoja-game-container .overlay.active {
+  opacity: 1;
+  pointer-events: auto; /* FIX: was 'all', which is non-standard for HTML */
+}
+
+#umoja-game-container .overlay-content {
+  background: var(--vq-panel-bg);
+  border: 2px solid var(--vq-teal-50);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 90%;
+  width: 420px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+#umoja-game-container .overlay h3 {
+  font-size: 2.8rem;
+  color: var(--vq-gold);
+  margin-top: 0;
+  margin-bottom: 10px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+#umoja-game-container .overlay p {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+#umoja-game-container .stars {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  letter-spacing: 4px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+#umoja-game-container .score-summary {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  text-align: left;
+}
+
+#umoja-game-container .score-summary strong {
+  color: var(--vq-gold);
+}
+
+/* ─── Button ─────────────────────────────────────────────────────────────────── */
+
+#umoja-game-container button.game-btn {
+  background: var(--vq-btn-gradient);
+  color: #fff;
+  border: none;
+  padding: 18px 40px;
+  font-size: 1.5rem;
+  font-family: var(--vq-font);
+  font-weight: 700;
+  border-radius: var(--vq-radius-pill);
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  box-shadow: var(--vq-btn-shadow);
+  text-shadow: var(--vq-btn-text-shadow);
+  width: 100%;
+}
+
+#umoja-game-container button.game-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* FIX: removed !important — specificity from #umoja-game-container is sufficient */
+#umoja-game-container button.game-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 0 rgba(0,0,0,0.3), inset 0 1px 2px rgba(0,0,0,0.15);
+}
+
+/* ─── Responsive overrides ───────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  #umoja-game-container {
+    padding: 24px 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  #umoja-game-container {
+    padding: 16px 10px;
+    border-radius: 0;
+  }
+
+  #umoja-game-container h2.game-title {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+
+  #umoja-game-container .stats {
+    font-size: 1rem;
+    gap: 10px;
+    padding: 10px 16px;
+    margin-bottom: 15px;
+  }
+
+  #umoja-game-container .streak-banner {
+    font-size: 1.4rem;
+    height: 30px;
+    margin-bottom: 10px;
+  }
+
+  #umoja-game-container .overlay-content {
+    padding: 24px 18px;
+  }
+
+  #umoja-game-container .overlay h3 {
+    font-size: 2rem;
+  }
+
+  #umoja-game-container button.game-btn {
+    padding: 15px 25px;
+    font-size: 1.3rem;
+  }
+}
