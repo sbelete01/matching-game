@@ -17,7 +17,7 @@ export const allCharacters = [
   { id: 10, name: "Cauliflower",  image: "cauliflower.png",  fact: "Can become pizza crust or rice!" },
   { id: 11, name: "Eggplant",     image: "eggplant.png",     fact: "Technically a giant berry!" },
   { id: 12, name: "Milk",         image: "milk.png",         fact: "Helps build strong bones & teeth!" },
-  { id: 13, name: "Pudding",      image: "pudding-v2.png",   fact: "In French, boudin means sausage!" },
+  { id: 13, name: "Pudding",      image: "pudding-v2.png",   fact: "Its name comes from boudin — the French word for sausage!" },
   { id: 14, name: "Salmon",       image: "salmon-v2.png",    fact: "Can leap 6 feet to clear waterfalls!" },
   { id: 15, name: "Spaghetti",    image: "spaghettit.png",   fact: "Athletes eat it for pre-race energy!" },
   { id: 16, name: "Steak",        image: "steak.png",        fact: "Packed with protein for big muscles!" },
