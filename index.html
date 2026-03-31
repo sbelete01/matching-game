@@ -195,6 +195,13 @@
         filter: brightness(1.15);
       }
 
+      /* iOS Safari backface-visibility fix — hide back face via opacity when flipped */
+      #umoja-game-container .card.flipped .card-back,
+      #umoja-game-container .card.matched .card-back {
+        opacity: 0;
+        pointer-events: none;
+      }
+
       /* Card front — trading-card style frame */
       #umoja-game-container .card-front {
         transform: rotateY(180deg);
