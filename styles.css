@@ -337,7 +337,7 @@ body {
 /* ─── Overlay ────────────────────────────────────────────────────────────────── */
 
 #umoja-game-container .overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(7, 28, 38, 0.88);
   backdrop-filter: blur(8px);
