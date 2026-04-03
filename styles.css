@@ -129,7 +129,7 @@ body {
     0 8px 16px rgba(0,0,0,0.25),
     0 0 40px rgba(139, 195, 74, 0.6);
   letter-spacing: 2px;
-  margin-top: 0;
+  margin-top: 50px;
   margin-bottom: 25px;
   text-align: center;
   animation: titleFloat 2.5s ease-in-out infinite alternate;
