@@ -6,33 +6,33 @@ body {
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  background-color: #071c26;
+  background-color: #87ceeb;
 }
 
 /* ─── Design tokens ──────────────────────────────────────────────────────────── */
 
 #umoja-game-container {
-  --vq-bg-dark:       #071c26;
-  --vq-primary-dark:  #063748;
-  --vq-teal:          #00a89c;
-  --vq-teal-light:    #08c4b4;
-  --vq-teal-shadow:   #006b62;
-  --vq-teal-50:       rgba(0, 168, 156, 0.5);
-  --vq-gold:          #fdbf0f;
-  --vq-green:         #4caf50;
-  --vq-red:           #ff5252;
-  --vq-white:         #ffffff;
-  --vq-font:          "Fredoka", sans-serif;
-  --vq-btn-gradient:  linear-gradient(180deg, #08c4b4 0%, #00a89c 40%, #00877e 100%);
-  --vq-btn-shadow:    0 6px 0 0 #006b62, 0 8px 20px rgba(0,0,0,0.35), inset 0 2px 0 rgba(255,255,255,0.25);
-  --vq-btn-text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  --vq-panel-bg:      rgba(6, 55, 72, 0.85);
-  --vq-radius-pill:   50px;
-  --vq-radius-card:   12px;
+  --vq-bg-dark:         #5a9a28;          /* grass green */
+  --vq-primary-dark:    #5c3d1e;          /* dark wood */
+  --vq-teal:            #558b2f;          /* field green */
+  --vq-teal-light:      #7cb342;          /* bright leaf */
+  --vq-teal-shadow:     #33691e;          /* deep grass */
+  --vq-teal-50:         rgba(85, 139, 47, 0.45);
+  --vq-gold:            #f5c518;          /* sunny yellow */
+  --vq-green:           #4caf50;
+  --vq-red:             #e53935;
+  --vq-white:           #fffde7;          /* warm cream */
+  --vq-font:            "Fredoka", sans-serif;
+  --vq-btn-gradient:    linear-gradient(180deg, #8bc34a 0%, #689f38 45%, #558b2f 100%);
+  --vq-btn-shadow:      0 6px 0 0 #33691e, 0 8px 20px rgba(0,0,0,0.25), inset 0 2px 0 rgba(255,255,255,0.3);
+  --vq-btn-text-shadow: 0 2px 3px rgba(0,0,0,0.25);
+  --vq-panel-bg:        rgba(92, 61, 30, 0.88);
+  --vq-radius-pill:     50px;
+  --vq-radius-card:     12px;
 
   font-family: var(--vq-font);
-  background-color: var(--vq-bg-dark);
-  color: var(--vq-white);
+  background: linear-gradient(180deg, #87ceeb 0%, #b8e8b8 55%, #5a9a28 100%);
+  color: var(--vq-primary-dark);
   padding: 40px 20px;
   display: flex;
   flex-direction: column;
@@ -47,74 +47,95 @@ body {
   z-index: 1;
 }
 
-/* ─── Starfield background ───────────────────────────────────────────────────── */
-/* Stars are spread across the full width (0–95% horizontal) */
+/* ─── Farmville background details ───────────────────────────────────────────── */
 
-#umoja-game-container::before,
+/* Sun in the upper-right corner */
+#umoja-game-container::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, #ffe066 30%, #ffd700 55%, transparent 72%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.75;
+  animation: sunPulse 5s ease-in-out infinite alternate;
+}
+
+/* Fluffy clouds */
 #umoja-game-container::after {
   content: "";
   position: absolute;
-  inset: 0;
+  top: 60px;
+  left: 5%;
+  width: 90%;
+  height: 80px;
+  background:
+    radial-gradient(ellipse 80px 40px at 15% 50%, rgba(255,255,255,0.7) 100%, transparent 100%),
+    radial-gradient(ellipse 60px 30px at 40% 60%, rgba(255,255,255,0.6) 100%, transparent 100%),
+    radial-gradient(ellipse 90px 35px at 65% 45%, rgba(255,255,255,0.65) 100%, transparent 100%),
+    radial-gradient(ellipse 50px 25px at 85% 55%, rgba(255,255,255,0.55) 100%, transparent 100%);
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
+  animation: cloudDrift 18s linear infinite alternate;
 }
 
-#umoja-game-container::before {
-  background-image:
-    radial-gradient(1.5px 1.5px at  7% 12%, #ffffff 50%, transparent 100%),
-    radial-gradient(1px   1px   at 35% 68%, #c8d8ff 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 55% 34%, #ffffff 50%, transparent 100%),
-    radial-gradient(1px   1px   at 80% 85%, #ffe8c0 50%, transparent 100%),
-    radial-gradient(2px   2px   at 92%  5%, #ffffff 50%, transparent 100%),
-    radial-gradient(1px   1px   at 68% 48%, #c8d8ff 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 45% 92%, #ffffff 50%, transparent 100%),
-    radial-gradient(1px   1px   at 25% 22%, #ffe8c0 50%, transparent 100%),
-    radial-gradient(1px   1px   at 72% 15%, #ffffff 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 88% 60%, #c8d8ff 50%, transparent 100%);
-  animation: starTwinkle1 8s ease-in-out infinite alternate;
+@keyframes sunPulse {
+  from { transform: scale(1);    opacity: 0.7; }
+  to   { transform: scale(1.06); opacity: 0.85; }
 }
 
-#umoja-game-container::after {
-  background-image:
-    radial-gradient(1px   1px   at 15% 28%, #ffffff 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 40% 52%, #ffe8c0 50%, transparent 100%),
-    radial-gradient(1px   1px   at 62%  8%, #c8d8ff 50%, transparent 100%),
-    radial-gradient(1px   1px   at 95% 95%, #ffffff 50%, transparent 100%),
-    radial-gradient(2px   2px   at 78% 45%, #ffffff 50%, transparent 100%),
-    radial-gradient(1px   1px   at 50% 75%, #ffe8c0 50%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 30% 40%, #ffffff 50%, transparent 100%),
-    radial-gradient(1px   1px   at 85% 30%, #c8d8ff 50%, transparent 100%);
-  animation: starTwinkle2 10s ease-in-out infinite alternate;
+@keyframes cloudDrift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(30px); }
 }
 
-@keyframes starTwinkle1 {
-  from { opacity: 0.5; }
-  to   { opacity: 0.9; }
+/* ─── Back to Arcade button ──────────────────────────────────────────────────── */
+
+#umoja-game-container .arcade-back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 253, 231, 0.85);
+  border: 2px solid #a0714f;
+  color: #5c3d1e;
+  font-family: var(--vq-font);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.15s, border-color 0.15s;
+  z-index: 10;
 }
 
-@keyframes starTwinkle2 {
-  from { opacity: 0.3; }
-  to   { opacity: 0.65; }
+#umoja-game-container .arcade-back-btn:hover {
+  background: #ffe082;
+  border-color: #f5c518;
 }
 
 /* ─── Title ──────────────────────────────────────────────────────────────────── */
 
 #umoja-game-container h2.game-title {
   font-size: clamp(2.2rem, 5vw, 3.5rem);
-  color: #ffffff;
+  color: #fff;
   text-shadow:
-    0 3px 0 #0a5e6e,
-    0 6px 0 #074550,
-    0 8px 16px rgba(0,0,0,0.35),
-    0 0 40px rgba(0, 168, 156, 0.5);
+    0 3px 0 #33691e,
+    0 6px 0 #1b5e20,
+    0 8px 16px rgba(0,0,0,0.25),
+    0 0 40px rgba(139, 195, 74, 0.6);
   letter-spacing: 2px;
   margin-top: 0;
   margin-bottom: 25px;
   text-align: center;
   animation: titleFloat 2.5s ease-in-out infinite alternate;
+  z-index: 1;
 }
 
-/* FIX: was translatey (lowercase y) — CSS transforms are case-sensitive */
 @keyframes titleFloat {
   from { transform: translateY(0); }
   to   { transform: translateY(-4px); }
@@ -128,13 +149,16 @@ body {
   font-size: 1.4rem;
   font-weight: 600;
   margin-bottom: 20px;
-  background: var(--vq-panel-bg);
-  border: 2px solid var(--vq-teal-50);
+  background: linear-gradient(180deg, #a0714f 0%, #8b5e3c 100%);
+  border: 3px solid #c4883a;
+  border-bottom: 4px solid #5c3d1e;
+  color: var(--vq-white);
   padding: 10px 25px;
   border-radius: var(--vq-radius-pill);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 0 #5c3d1e, 0 6px 12px rgba(0,0,0,0.2);
   flex-wrap: wrap;
   justify-content: center;
+  z-index: 1;
 }
 
 #umoja-game-container .stat-item {
@@ -148,14 +172,15 @@ body {
 #umoja-game-container .streak-banner {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--vq-gold);
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  color: #f5c518;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 10px;
   transition: opacity 0.4s;
+  z-index: 1;
 }
 
 /* ─── Game board ─────────────────────────────────────────────────────────────── */
@@ -166,6 +191,7 @@ body {
   justify-content: center;
   width: 100%;
   max-width: 1000px;
+  z-index: 1;
 }
 
 /* ─── Card shell ─────────────────────────────────────────────────────────────── */
@@ -195,7 +221,7 @@ body {
 #umoja-game-container .card.matched .card-inner {
   transform: rotateY(180deg);
   animation: matchPop 0.5s ease forwards;
-  box-shadow: 0 0 0 4px var(--vq-green), 0 8px 20px rgba(76,175,80,0.4);
+  box-shadow: 0 0 0 4px #7cb342, 0 8px 20px rgba(124,179,66,0.45);
 }
 
 @keyframes matchPop {
@@ -234,44 +260,47 @@ body {
   box-sizing: border-box;
 }
 
-/* Back face */
+/* Back face — wooden plank */
 #umoja-game-container .card-back {
-  background: linear-gradient(160deg, #2a2f35 0%, #33383e 50%, #2a2f35 100%);
-  border: 3px solid rgba(255,255,255,0.15);
+  background: repeating-linear-gradient(
+    180deg,
+    #a0714f 0px, #8b5e3c 18px,
+    #96673f 19px, #a0714f 36px
+  );
+  border: 3px solid #c4883a;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
   overflow: hidden;
   flex-direction: column;
   gap: 6px;
-  transition: border-color 0.25s ease, filter 0.25s ease;
+  transition: filter 0.25s ease;
 }
 
 #umoja-game-container .card-back-icon {
   font-size: clamp(2.2rem, 6vw, 3.2rem);
   z-index: 2;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
-  opacity: 0.8;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 #umoja-game-container .card:hover:not(.flipped):not(.matched) .card-back {
-  filter: brightness(1.25);
-  border-color: rgba(255,255,255,0.3);
+  filter: brightness(1.2);
 }
 
-/* iOS Safari fix: force back face invisible when card is flipped */
+/* iOS Safari fix */
 #umoja-game-container .card.flipped .card-back,
 #umoja-game-container .card.matched .card-back {
   opacity: 0;
   pointer-events: none;
 }
 
-/* Front face */
+/* Front face — cream with wooden frame */
 #umoja-game-container .card-front {
   transform: rotateY(180deg);
   flex-direction: column;
   padding: 4px;
   overflow: hidden;
-  background: linear-gradient(160deg, #3d2000 0%, #6a3a00 40%, #8a5a10 100%);
-  border: 3px solid var(--vq-gold);
-  box-shadow: 0 0 20px rgba(253,191,15,0.25), inset 0 0 20px rgba(253,191,15,0.08);
+  background: linear-gradient(160deg, #8b5e3c 0%, #a0714f 50%, #8b5e3c 100%);
+  border: 3px solid #c4883a;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
 
 #umoja-game-container .card-img-area {
@@ -282,7 +311,7 @@ body {
   justify-content: center;
   padding: 10px;
   box-sizing: border-box;
-  background: linear-gradient(160deg, #fffbf0 0%, #fff8e1 100%);
+  background: linear-gradient(160deg, #fffde7 0%, #fff9c4 100%);
   border-radius: 6px 6px 0 0;
 }
 
@@ -290,7 +319,7 @@ body {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2));
 }
 
 /* ─── Card banners ───────────────────────────────────────────────────────────── */
@@ -308,25 +337,27 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 0 0 6px 6px;
-  color: var(--vq-primary-dark);
 }
 
+/* Name card banner — golden hay */
 #umoja-game-container .card-banner.name {
-  background: var(--vq-gold);
+  background: linear-gradient(90deg, #ffd740, #f5c518);
+  color: #5c3d1e;
   font-size: clamp(0.7rem, 2.2vw, 1rem);
   min-height: 2.4em;
 }
 
+/* Fact card banner — leafy green */
 #umoja-game-container .card-banner.fact {
-  background: var(--vq-teal-light);
-  color: #fff;
+  background: linear-gradient(90deg, #558b2f, #7cb342);
+  color: #fffde7;
   font-size: clamp(0.55rem, 1.8vw, 0.75rem);
-  flex: 0 0 40%;
+  flex: 0 0 auto;
+  max-height: 45%;
   overflow: hidden;
 }
 
 /* ─── Confetti particles ─────────────────────────────────────────────────────── */
-/* NOTE: animation is handled by the Web Animations API in confetti.js — no keyframes needed here */
 
 #umoja-game-container .confetti-piece {
   position: absolute;
@@ -334,12 +365,141 @@ body {
   z-index: 50;
 }
 
+/* ─── Pop quiz overlay ───────────────────────────────────────────────────────── */
+
+#umoja-game-container .quiz-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 94, 32, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 110;
+}
+
+#umoja-game-container .quiz-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#umoja-game-container .quiz-content {
+  background: linear-gradient(160deg, #a0714f 0%, #8b5e3c 100%);
+  border: 3px solid #c4883a;
+  border-bottom: 5px solid #5c3d1e;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+#umoja-game-container .quiz-header {
+  text-align: center;
+}
+
+#umoja-game-container .quiz-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #ffd740, #f5c518);
+  color: #5c3d1e;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 50px;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  box-shadow: 0 3px 0 #b8860b;
+}
+
+#umoja-game-container .quiz-question {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--vq-white);
+  margin: 0;
+}
+
+#umoja-game-container .quiz-image {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
+}
+
+#umoja-game-container .quiz-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffd740;
+  letter-spacing: 1px;
+}
+
+#umoja-game-container .quiz-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+#umoja-game-container .quiz-choice-btn {
+  width: 100%;
+  background: rgba(255, 253, 231, 0.12);
+  border: 2px solid #c4883a;
+  color: var(--vq-white);
+  font-family: var(--vq-font);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  line-height: 1.4;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+#umoja-game-container .quiz-choice-btn:hover:not(:disabled) {
+  background: rgba(255, 215, 64, 0.2);
+  border-color: #f5c518;
+}
+
+#umoja-game-container .quiz-choice-btn:disabled {
+  cursor: default;
+}
+
+#umoja-game-container .quiz-choice-btn.correct {
+  background: rgba(76, 175, 80, 0.3);
+  border-color: #7cb342;
+  color: #dcedc8;
+}
+
+#umoja-game-container .quiz-choice-btn.wrong {
+  background: rgba(229, 57, 53, 0.2);
+  border-color: var(--vq-red);
+  color: #ffcdd2;
+}
+
+#umoja-game-container .quiz-feedback {
+  font-size: 0.9rem;
+  font-weight: 700;
+  min-height: 1.4em;
+  text-align: center;
+}
+
+#umoja-game-container .quiz-feedback.correct { color: #dcedc8; }
+#umoja-game-container .quiz-feedback.wrong    { color: #ffcdd2; }
+
 /* ─── Overlay ────────────────────────────────────────────────────────────────── */
 
 #umoja-game-container .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(7, 28, 38, 0.88);
+  background: rgba(27, 94, 32, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -354,30 +514,32 @@ body {
 
 #umoja-game-container .overlay.active {
   opacity: 1;
-  pointer-events: auto; /* FIX: was 'all', which is non-standard for HTML */
+  pointer-events: auto;
 }
 
 #umoja-game-container .overlay-content {
-  background: var(--vq-panel-bg);
-  border: 2px solid var(--vq-teal-50);
+  background: linear-gradient(160deg, #a0714f 0%, #8b5e3c 100%);
+  border: 3px solid #c4883a;
+  border-bottom: 5px solid #5c3d1e;
   padding: 40px;
   border-radius: 20px;
   text-align: center;
   max-width: 90%;
   width: 420px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.4);
 }
 
 #umoja-game-container .overlay h3 {
   font-size: 2.8rem;
-  color: var(--vq-gold);
+  color: #ffd740;
   margin-top: 0;
   margin-bottom: 10px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  text-shadow: 0 3px 0 #b8860b, 0 5px 10px rgba(0,0,0,0.3);
 }
 
 #umoja-game-container .overlay p {
   font-size: 1.2rem;
+  color: var(--vq-white);
   margin-bottom: 15px;
 }
 
@@ -385,22 +547,23 @@ body {
   font-size: 2.5rem;
   margin-bottom: 10px;
   letter-spacing: 4px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 #umoja-game-container .score-summary {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(196,136,58,0.5);
   border-radius: 10px;
   padding: 15px 20px;
   margin-bottom: 25px;
   font-size: 1.1rem;
   line-height: 1.8;
   text-align: left;
+  color: var(--vq-white);
 }
 
 #umoja-game-container .score-summary strong {
-  color: var(--vq-gold);
+  color: #ffd740;
 }
 
 /* ─── Button ─────────────────────────────────────────────────────────────────── */
@@ -425,7 +588,6 @@ body {
   filter: brightness(1.1);
 }
 
-/* FIX: removed !important — specificity from #umoja-game-container is sufficient */
 #umoja-game-container button.game-btn:active {
   transform: translateY(4px);
   box-shadow: 0 2px 0 0 rgba(0,0,0,0.3), inset 0 1px 2px rgba(0,0,0,0.15);

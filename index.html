@@ -1,49 +1,343 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Root Recall</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arcade Garden</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-    <!-- Preconnect to cut Google Fonts DNS + TLS latency -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    :root {
+      --bg-color:        #111;
+      --cabinet-color:   #2c2c38;
+      --screen-bg:       #3b2a5c;
+      --text-main:       #64dcf0;
+      --text-highlight:  #ffb300;
+      --text-white:      #fcfcfc;
+      --grid-color:      rgba(255, 255, 255, 0.05);
+    }
 
-    <!-- FIX: Removed Inter — Fredoka is the active font; Inter was never used -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    *, *::before, *::after { box-sizing: border-box; }
 
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div id="umoja-game-container">
-      <h2 class="game-title">🌱 Root Recall! 🍎</h2>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
 
-      <div class="stats">
-        <div class="stat-item">Level: <span id="level-display">1</span></div>
-        <div class="stat-item">
-          Matches: <span id="match-display">0</span>/<span id="total-matches">3</span>
+    body {
+      font-family: 'Press Start 2P', cursive;
+      user-select: none;
+    }
+
+    /* ── Cabinet fills the full viewport ── */
+    .arcade-machine {
+      position: fixed;
+      inset: 0;
+      background-color: var(--cabinet-color);
+      padding: 20px;
+      box-shadow: inset 0 5px 15px rgba(255,255,255,0.07);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .marquee { display: none; }
+
+    /* ── Bezel ── */
+    .screen-bezel {
+      flex: 1;
+      background: #1a1a1a;
+      padding: 16px;
+      border-radius: 24px;
+      box-shadow: inset 0 0 20px #000;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── CRT screen ── */
+    .crt-screen {
+      flex: 1;
+      position: relative;
+      background-color: var(--screen-bg);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Scanlines */
+    .crt-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.12) 50%);
+      background-size: 100% 4px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Vignette */
+    .crt-screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 70px rgba(0,0,0,0.7);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* ── Screen content ── */
+    .screen-content {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(16px, 3vw, 48px);
+      color: var(--text-main);
+      text-shadow: 2px 2px 0 #000, 0 0 5px var(--text-main);
+      transition: opacity 0.2s ease;
+    }
+
+    /* ── HUD ── */
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 0.65rem;
+      line-height: 1.6;
+    }
+
+    .hud-left { color: var(--text-white); text-shadow: 2px 2px 0 #000; }
+    .hud-score { color: var(--text-highlight); }
+    .hearts { color: #ff5555; text-shadow: 0 0 5px #ff5555; letter-spacing: 4px; }
+
+    /* ── Menu ── */
+    .menu-container { text-align: center; }
+
+    .arcade-brand {
+      color: var(--text-highlight);
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px var(--text-highlight);
+    }
+
+    .main-title {
+      color: var(--text-highlight);
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      margin-bottom: 28px;
+      text-shadow: 3px 3px 0 #000, 0 0 15px var(--text-highlight);
+    }
+
+    .menu-options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* Game options as proper clickable buttons */
+    .game-option {
+      font-size: clamp(0.7rem, 2vw, 0.95rem);
+      color: var(--text-white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: min(340px, 85%);
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(100, 220, 240, 0.3);
+      border-radius: 8px;
+      padding: 14px 24px;
+      text-shadow: 2px 2px 0 #000;
+      box-shadow: 0 0 10px rgba(100,220,240,0.1);
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+      position: relative;
+    }
+
+    .game-option:hover {
+      background: rgba(100, 220, 240, 0.12);
+      border-color: var(--text-main);
+      box-shadow: 0 0 16px rgba(100,220,240,0.25);
+      transform: translateY(-1px);
+    }
+
+    .game-option.active {
+      color: var(--text-highlight);
+      background: rgba(255, 179, 0, 0.12);
+      border-color: var(--text-highlight);
+      box-shadow: 0 0 18px rgba(255,179,0,0.3);
+      text-shadow: 2px 2px 0 #000, 0 0 8px var(--text-highlight);
+    }
+
+    /* Arrow cursor hidden — button highlight is sufficient */
+    .cursor { display: none; }
+
+    /* ── Footer hint ── */
+    .instructions {
+      text-align: center;
+      font-size: 0.5rem;
+      color: rgba(252,252,252,0.5);
+      line-height: 1.8;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    /* ── Loading overlay ── */
+    #loading-screen {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 10;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-main);
+      font-size: 1.2rem;
+      text-align: center;
+      line-height: 2;
+      text-shadow: 0 0 10px var(--text-main);
+    }
+
+    @keyframes blink {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .main-title { font-size: 1.4rem; margin-bottom: 20px; }
+      .menu-options { gap: 12px; }
+      .game-option { padding: 12px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="arcade-machine">
+    <div class="marquee">&#9776; ARCADE GARDEN &#9776;</div>
+
+    <div class="screen-bezel">
+      <div class="crt-screen">
+
+        <div id="loading-screen">
+          <span id="loading-text">LOADING...</span>
         </div>
-        <div class="stat-item">⭐ <span id="score-display">0</span></div>
-      </div>
 
-      <div class="streak-banner" id="streak-banner"></div>
-      <div class="game-board" id="game-board"></div>
+        <div class="screen-content" id="main-ui">
+          <div class="hud">
+            <div class="hud-left">HI-SCORE<br><span class="hud-score" id="hi-score">000000</span></div>
+            <div class="hearts">&#x2665;&#x2665;&#x2665;&#x2665;&#x2665;</div>
+          </div>
 
-      <div class="overlay" id="overlay">
-        <div class="overlay-content">
-          <h3 id="overlay-title">Great Job! 🎉</h3>
-          <div class="stars" id="overlay-stars">⭐⭐⭐</div>
-          <p id="overlay-message">You matched all the facts!</p>
-          <div class="score-summary" id="score-summary"></div>
-          <button class="game-btn" id="next-level-btn">Next Level!</button>
+          <div class="menu-container">
+            <div class="arcade-brand">&#9776; ARCADE GARDEN &#9776;</div>
+            <div class="main-title">SELECT GAME</div>
+            <ul class="menu-options" id="game-list">
+              <!-- Add more games by copying a <li> and updating data-url -->
+              <li class="game-option active" data-url="https://play.umojahealth.com/" data-external="true">
+                <span class="cursor">&#9654;</span>
+                VEGGIE QUEST
+              </li>
+              <li class="game-option" data-url="root-recall.html">
+                <span class="cursor">&#9654;</span>
+                ROOT RECALL
+              </li>
+            </ul>
+          </div>
+
+          <div class="instructions">
+            CLICK A GAME TO PLAY &nbsp;&#183;&nbsp; ARROWS + ENTER FOR KEYBOARD
+          </div>
         </div>
+
       </div>
     </div>
+  </div>
 
-    <!-- type="module" enables ES imports and defers execution automatically -->
-    <script type="module" src="js/game.js"></script>
-  </body>
+  <script>
+    (() => {
+      const options       = document.querySelectorAll('.game-option');
+      const loadingScreen = document.getElementById('loading-screen');
+      const loadingText   = document.getElementById('loading-text');
+      const mainUi        = document.getElementById('main-ui');
+      const hiScoreEl     = document.getElementById('hi-score');
+
+      // Show high score from Root Recall if available
+      const hs = JSON.parse(localStorage.getItem('umoja_highscore') || 'null');
+      if (hs) hiScoreEl.textContent = String(hs.score).padStart(6, '0');
+
+      let currentIndex = 0;
+      let isLocked = false;
+
+      function updateSelection() {
+        options.forEach((opt, i) => opt.classList.toggle('active', i === currentIndex));
+      }
+
+      function launchGame() {
+        if (isLocked) return;
+        isLocked = true;
+
+        const option     = options[currentIndex];
+        const url        = option.dataset.url;
+        const name       = option.textContent.trim();
+        const isExternal = option.dataset.external === 'true';
+
+        if (isExternal) {
+          window.open(url, '_blank', 'noopener,noreferrer');
+          isLocked = false;
+          return;
+        }
+
+        mainUi.style.opacity = '0';
+        setTimeout(() => {
+          loadingScreen.style.display = 'flex';
+          loadingText.innerHTML = `LOADING<br><br>${name}...`;
+          setTimeout(() => { window.location.href = url; }, 1200);
+        }, 200);
+      }
+
+      // Keyboard
+      window.addEventListener('keydown', (e) => {
+        if (isLocked) return;
+        if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') {
+          currentIndex = (currentIndex + 1) % options.length;
+          updateSelection();
+          e.preventDefault();
+        } else if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
+          currentIndex = (currentIndex - 1 + options.length) % options.length;
+          updateSelection();
+          e.preventDefault();
+        } else if (e.key === 'Enter' || e.key === ' ') {
+          launchGame();
+          e.preventDefault();
+        }
+      });
+
+      // Mouse
+      options.forEach((option, index) => {
+        option.addEventListener('mouseenter', () => {
+          if (isLocked) return;
+          currentIndex = index;
+          updateSelection();
+        });
+        option.addEventListener('click', () => {
+          if (isLocked) return;
+          currentIndex = index;
+          updateSelection();
+          launchGame();
+        });
+      });
+    })();
+  </script>
+
+</body>
 </html>

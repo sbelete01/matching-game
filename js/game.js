@@ -13,6 +13,19 @@ import { spawnConfetti } from './confetti.js';
 
 const IMAGE_BASE_PATH = './images/';
 const HS_KEY          = 'umoja_highscore';
+const SAVE_KEY        = 'umoja_progress';
+
+function saveProgress() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify({ currentLevelIndex, score, totalFlips }));
+}
+
+function loadProgress() {
+  const saved = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
+  if (!saved) return;
+  currentLevelIndex = Math.min(saved.currentLevelIndex ?? 0, levelsInfo.length - 1);
+  score             = saved.score      ?? 0;
+  totalFlips        = saved.totalFlips ?? 0;
+}
 
 // ─── DOM refs (cached once at startup) ───────────────────────────────────────
 
@@ -45,6 +58,7 @@ let totalFlips        = 0;
 let levelStartScore   = 0;
 let streakTimeout     = null;
 let resizeTimer       = null;
+let levelCharacters   = [];  // characters used in the current level
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
@@ -135,6 +149,7 @@ export function initLevel() {
   setGridColumns(levelData);
 
   const selected   = shuffle(allCharacters).slice(0, levelData.pairs);
+  levelCharacters  = selected;
   const cardsArray = shuffle(
     selected.flatMap(char => [
       { id: char.id, label: char.name, bannerClass: 'name', src: char.image },
@@ -181,12 +196,11 @@ function onMatch() {
 
   firstCard.classList.add('matched');
   secondCard.classList.add('matched');
-  firstCard.classList.remove('flipped');
-  secondCard.classList.remove('flipped');
 
   matchedPairs++;
   matchDisplay.innerText = matchedPairs;
   playMatchSound();
+  saveProgress();
 
   const cr = container.getBoundingClientRect();
   [firstCard, secondCard].forEach(c => {
@@ -229,30 +243,96 @@ function levelComplete() {
   playLevelUpSound();
   totalFlips += levelFlips;
 
-  // Flood the screen with confetti
   for (let i = 0; i < 6; i++) {
     setTimeout(() => {
       spawnConfetti(container, Math.random() * container.offsetWidth, 50 + Math.random() * 100, 25);
     }, i * 200);
   }
 
-  const pairs = levelsInfo[currentLevelIndex].pairs;
-  const ratio = (pairs * 2) / levelFlips;
-  const stars = ratio >= 0.85 ? '⭐⭐⭐' : ratio >= 0.6 ? '⭐⭐' : '⭐';
+  // Show quiz first, then the level summary when it's done
+  showQuiz(() => {
+    const pairs = levelsInfo[currentLevelIndex].pairs;
+    const ratio = (pairs * 2) / levelFlips;
+    const stars = ratio >= 0.85 ? '⭐⭐⭐' : ratio >= 0.6 ? '⭐⭐' : '⭐';
 
-  if (currentLevelIndex < levelsInfo.length - 1) {
-    overlayTitle.innerText   = 'Great Job! 🎉';
-    overlayStars.innerText   = stars;
-    overlayMessage.innerText = 'You found all the matches! Ready for more?';
-    scoreSummary.innerHTML   =
-      `<strong>Flips this level:</strong> ${levelFlips}<br>` +
-      `<strong>Level score:</strong> ${score - levelStartScore} pts`;
-    nextLevelBtn.innerText   = 'Next Level →';
-    nextLevelBtn.onclick     = () => { currentLevelIndex++; initLevel(); };
-    overlay.classList.add('active');
-  } else {
-    showWinScreen();
-  }
+    if (currentLevelIndex < levelsInfo.length - 1) {
+      overlayTitle.innerText   = 'Great Job! 🎉';
+      overlayStars.innerText   = stars;
+      overlayMessage.innerText = 'You found all the matches! Ready for more?';
+      scoreSummary.innerHTML   =
+        `<strong>Flips this level:</strong> ${levelFlips}<br>` +
+        `<strong>Level score:</strong> ${score - levelStartScore} pts`;
+      nextLevelBtn.innerText   = 'Next Level →';
+      nextLevelBtn.onclick     = () => { currentLevelIndex++; saveProgress(); initLevel(); };
+      overlay.classList.add('active');
+    } else {
+      showWinScreen();
+    }
+  });
+}
+
+// ─── Pop quiz ─────────────────────────────────────────────────────────────────
+
+function showQuiz(onComplete) {
+  const quizOverlay = document.getElementById('quiz-overlay');
+  const quizImage   = document.getElementById('quiz-image');
+  const quizName    = document.getElementById('quiz-name');
+  const quizChoices = document.getElementById('quiz-choices');
+  const quizFeedback = document.getElementById('quiz-feedback');
+  const quizNextBtn = document.getElementById('quiz-next-btn');
+
+  // Pick a random character from this level
+  const subject    = levelCharacters[Math.floor(Math.random() * levelCharacters.length)];
+  // 3 wrong distractors from characters NOT in this level's set
+  const others     = allCharacters.filter(c => c.id !== subject.id);
+  const distractors = shuffle(others).slice(0, 3);
+  const choices    = shuffle([subject, ...distractors]);
+
+  quizImage.src       = IMAGE_BASE_PATH + subject.image;
+  quizImage.alt       = subject.name;
+  quizName.textContent = subject.name.toUpperCase();
+  quizFeedback.textContent = '';
+  quizFeedback.className   = 'quiz-feedback';
+  quizNextBtn.style.display = 'none';
+  quizChoices.innerHTML = '';
+
+  choices.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className   = 'quiz-choice-btn';
+    btn.textContent = ch.fact;
+    btn.onclick = () => {
+      // Lock all buttons after first pick
+      quizChoices.querySelectorAll('.quiz-choice-btn').forEach(b => b.disabled = true);
+
+      if (ch.id === subject.id) {
+        btn.classList.add('correct');
+        quizFeedback.textContent = '✅ Correct! +50 bonus points!';
+        quizFeedback.className   = 'quiz-feedback correct';
+        score += 50;
+        scoreDisplay.innerText = score;
+        saveProgress();
+      } else {
+        btn.classList.add('wrong');
+        // Highlight the correct answer
+        [...quizChoices.children].forEach((b, i) => {
+          if (choices[i].id === subject.id) b.classList.add('correct');
+        });
+        quizFeedback.textContent = '❌ Not quite! Check the answer above.';
+        quizFeedback.className   = 'quiz-feedback wrong';
+      }
+
+      quizNextBtn.style.display = 'block';
+    };
+    quizChoices.appendChild(btn);
+  });
+
+  quizNextBtn.textContent = 'Continue →';
+  quizNextBtn.onclick = () => {
+    quizOverlay.classList.remove('active');
+    onComplete();
+  };
+
+  quizOverlay.classList.add('active');
 }
 
 function showWinScreen() {
@@ -282,9 +362,10 @@ function showWinScreen() {
   nextLevelBtn.innerText = 'Play Again';
   nextLevelBtn.onclick   = () => {
     currentLevelIndex = 0;
-    score             = 0;
+    score             = 0;8
     totalFlips        = 0;
     scoreDisplay.innerText = 0;
+    localStorage.removeItem(SAVE_KEY);
     initLevel();
   };
   overlay.classList.add('active');
@@ -299,4 +380,5 @@ window.addEventListener('resize', () => {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
+loadProgress();
 initLevel();

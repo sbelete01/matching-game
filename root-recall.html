@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Root Recall</title>
+
+    <!-- Preconnect to cut Google Fonts DNS + TLS latency -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- FIX: Removed Inter — Fredoka is the active font; Inter was never used -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="umoja-game-container">
+      <button class="arcade-back-btn" onclick="window.location.href='index.html'" title="Back to Arcade">&#9664; ARCADE</button>
+      <h2 class="game-title">🌱 Root Recall! 🍎</h2>
+
+      <div class="stats">
+        <div class="stat-item">Level: <span id="level-display">1</span></div>
+        <div class="stat-item">
+          Matches: <span id="match-display">0</span>/<span id="total-matches">3</span>
+        </div>
+        <div class="stat-item">⭐ <span id="score-display">0</span></div>
+      </div>
+
+      <div class="streak-banner" id="streak-banner"></div>
+      <div class="game-board" id="game-board"></div>
+
+      <!-- Pop quiz shown between levels -->
+      <div class="quiz-overlay" id="quiz-overlay">
+        <div class="quiz-content">
+          <div class="quiz-header">
+            <div class="quiz-badge">⚡ QUICK QUIZ</div>
+            <p class="quiz-question">What's the fun fact about this food?</p>
+          </div>
+          <img id="quiz-image" class="quiz-image" src="" alt="" />
+          <div class="quiz-name" id="quiz-name"></div>
+          <div class="quiz-choices" id="quiz-choices"></div>
+          <div class="quiz-feedback" id="quiz-feedback"></div>
+          <button class="game-btn quiz-next-btn" id="quiz-next-btn" style="display:none"></button>
+        </div>
+      </div>
+
+      <div class="overlay" id="overlay">
+        <div class="overlay-content">
+          <h3 id="overlay-title">Great Job! 🎉</h3>
+          <div class="stars" id="overlay-stars">⭐⭐⭐</div>
+          <p id="overlay-message">You matched all the facts!</p>
+          <div class="score-summary" id="score-summary"></div>
+          <button class="game-btn" id="next-level-btn">Next Level!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- type="module" enables ES imports and defers execution automatically -->
+    <script type="module" src="js/game.js"></script>
+  </body>
+</html>
