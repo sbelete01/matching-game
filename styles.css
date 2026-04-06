@@ -96,27 +96,47 @@ body {
 
 /* ─── Back to Arcade button ──────────────────────────────────────────────────── */
 
+/* ─── Title row (back button + title on same line) ───────────────────────────── */
+
+#umoja-game-container .title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  z-index: 1;
+}
+
 #umoja-game-container .arcade-back-btn {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  background: rgba(255, 253, 231, 0.85);
-  border: 2px solid #a0714f;
-  color: #5c3d1e;
+  left: 0;
+  background: linear-gradient(180deg, #a0714f 0%, #8b5e3c 100%);
+  border: 3px solid #c4883a;
+  border-bottom: 4px solid #5c3d1e;
+  border-radius: 12px;
+  color: var(--vq-white);
   font-family: var(--vq-font);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
   padding: 8px 14px;
-  border-radius: 8px;
   cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: background 0.15s, border-color 0.15s;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+  transition: transform 0.1s, box-shadow 0.1s, filter 0.2s;
   z-index: 10;
 }
 
 #umoja-game-container .arcade-back-btn:hover {
-  background: #ffe082;
-  border-color: #f5c518;
+  filter: brightness(1.15);
+}
+
+#umoja-game-container .arcade-back-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
+  border-bottom: 0px solid #5c3d1e;
+  margin-bottom: 4px;
 }
 
 /* ─── Title ──────────────────────────────────────────────────────────────────── */
@@ -130,8 +150,7 @@ body {
     0 8px 16px rgba(0,0,0,0.25),
     0 0 40px rgba(139, 195, 74, 0.6);
   letter-spacing: 2px;
-  margin-top: 50px;
-  margin-bottom: 25px;
+  margin: 0;
   text-align: center;
   animation: titleFloat 2.5s ease-in-out infinite alternate;
   z-index: 1;
