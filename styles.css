@@ -363,7 +363,7 @@ body {
 #umoja-game-container .card-banner.name {
   background: linear-gradient(90deg, #ffd740, #f5c518);
   color: #5c3d1e;
-  font-size: clamp(0.7rem, 2.2vw, 1rem);
+  font-size: clamp(0.75rem, 2.2vw, 1rem);
   min-height: 2.4em;
 }
 
@@ -371,7 +371,7 @@ body {
 #umoja-game-container .card-banner.fact {
   background: linear-gradient(90deg, #558b2f, #7cb342);
   color: #fffde7;
-  font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+  font-size: clamp(0.75rem, 1.8vw, 0.9rem);
   flex: 0 0 auto;
   max-height: 45%;
   overflow: hidden;
