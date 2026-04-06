@@ -361,7 +361,14 @@ function showQuiz(onComplete) {
 
       if (ch.id === subject.id) {
         btn.classList.add("correct");
-        quizFeedback.textContent = "✅ Correct! +50 bonus points!";
+        const correctMessages = [
+          "🌟 SMART PICK! You're a Food Expert!",
+          "🔥 BOOM! You really know your food!",
+          "💥 AMAZING! Nothing gets past you!",
+          "⭐ YES! You're on fire!",
+          "🏆 NAILED IT! Food genius confirmed!",
+        ];
+        quizFeedback.textContent = correctMessages[Math.floor(Math.random() * correctMessages.length)] + " +50 bonus points!";
         quizFeedback.className = "quiz-feedback correct";
         score += 50;
         scoreDisplay.innerText = score;
@@ -372,7 +379,13 @@ function showQuiz(onComplete) {
         [...quizChoices.children].forEach((b, i) => {
           if (choices[i].id === subject.id) b.classList.add("correct");
         });
-        quizFeedback.textContent = "❌ Not quite! Check the answer above.";
+        const wrongMessages = [
+          "So close! Give it another look!",
+          "Almost! Check the right answer above!",
+          "Good try! You'll get it next time!",
+          "Not this one — but now you know!",
+        ];
+        quizFeedback.textContent = "❌ " + wrongMessages[Math.floor(Math.random() * wrongMessages.length)];
         quizFeedback.className = "quiz-feedback wrong";
       }
 
