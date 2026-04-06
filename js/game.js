@@ -237,10 +237,9 @@ function onMiss() {
 }
 
 function resetBoard() {
-  hasFlippedCard = false;
-  lockBoard      = false;
-  firstCard      = null;
-  secondCard     = null;
+  lockBoard  = false;
+  firstCard  = null;
+  secondCard = null;
 }
 
 // ─── Level complete / win screen ──────────────────────────────────────────────
