@@ -19,17 +19,26 @@
   </head>
   <body>
     <div id="umoja-game-container">
-      <div class="title-row">
-        <button class="arcade-back-btn" onclick="window.location.href='index.html'" title="Back to Arcade">&#9664;</button>
-        <h2 class="game-title">🌱 Root Recall! 🍎</h2>
-      </div>
-
-      <div class="stats">
-        <div class="stat-item">Level: <span id="level-display">1</span></div>
-        <div class="stat-item">
-          Matches: <span id="match-display">0</span>/<span id="total-matches">3</span>
+      <div class="header-section">
+        <div class="title-row">
+          <button class="arcade-back-btn" onclick="window.location.href='index.html'" title="Back to Arcade">&#8592;</button>
+          <div class="title-container">
+            <h2 class="game-title">Root Recall!</h2>
+          </div>
         </div>
-        <div class="stat-item">⭐ <span id="score-display">0</span></div>
+        <div class="stats-plank">
+          <div class="plank-item">
+            <span>Level:</span>
+            <span id="level-display">1</span>
+          </div>
+          <div class="plank-item">
+            Matches: <span id="match-display">0</span> / <span id="total-matches">3</span>
+          </div>
+          <div class="plank-item">
+            <span>⭐</span>
+            <span id="score-display">0</span>
+          </div>
+        </div>
       </div>
 
       <div class="streak-banner" id="streak-banner"></div>

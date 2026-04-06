@@ -130,7 +130,7 @@ function buildCard(cardData) {
   card.innerHTML = `
     <div class="card-inner">
       <div class="card-face card-back">
-        <div class="card-back-icon">🍎</div>
+        <div class="card-back-icon">🌱</div>
       </div>
       <div class="card-face card-front">
         <div class="card-img-area">
