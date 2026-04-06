@@ -196,26 +196,30 @@ function onMatch() {
   score += 100 + Math.max(0, streak - 1) * 25;
   scoreDisplay.innerText = score;
   showStreak(streak);
-
-  card1.classList.add('matched');
-  card2.classList.add('matched');
-
   matchedPairs++;
   matchDisplay.innerText = matchedPairs;
   playMatchSound();
   saveProgress();
 
-  const cr = container.getBoundingClientRect();
-  [card1, card2].forEach(c => {
-    const r = c.getBoundingClientRect();
-    spawnConfetti(container, r.left - cr.left + r.width / 2, r.top - cr.top + r.height / 2, 14);
-  });
+  // Wait for the flip transition to finish before applying matched state
+  setTimeout(() => {
+    card1.classList.remove('flipped');
+    card2.classList.remove('flipped');
+    card1.classList.add('matched');
+    card2.classList.add('matched');
 
-  resetBoard();
+    const cr = container.getBoundingClientRect();
+    [card1, card2].forEach(c => {
+      const r = c.getBoundingClientRect();
+      spawnConfetti(container, r.left - cr.left + r.width / 2, r.top - cr.top + r.height / 2, 14);
+    });
 
-  if (matchedPairs === levelsInfo[currentLevelIndex].pairs) {
-    setTimeout(levelComplete, 700);
-  }
+    resetBoard();
+
+    if (matchedPairs === levelsInfo[currentLevelIndex].pairs) {
+      setTimeout(levelComplete, 700);
+    }
+  }, 600);
 }
 
 function onMiss() {
@@ -226,14 +230,17 @@ function onMiss() {
   showStreak(0);
   playMissSound();
 
-  card1.classList.add('shake');
-  card2.classList.add('shake');
-
+  // Wait for the flip transition to finish, then shake and flip back together
   setTimeout(() => {
-    card1.classList.remove('shake', 'flipped');
-    card2.classList.remove('shake', 'flipped');
-    resetBoard();
-  }, 1000);
+    card1.classList.add('shake');
+    card2.classList.add('shake');
+
+    setTimeout(() => {
+      card1.classList.remove('flipped', 'shake');
+      card2.classList.remove('flipped', 'shake');
+      resetBoard();
+    }, 600);
+  }, 600);
 }
 
 function resetBoard() {
