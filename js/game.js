@@ -47,7 +47,6 @@ const nextLevelBtn     = document.getElementById('next-level-btn');
 
 let currentLevelIndex = 0;
 let matchedPairs      = 0;
-let hasFlippedCard    = false;
 let lockBoard         = false;
 let firstCard         = null;
 let secondCard        = null;
@@ -128,7 +127,6 @@ function buildCard(cardData) {
 
 export function initLevel() {
   matchedPairs    = 0;
-  hasFlippedCard  = false;
   lockBoard       = false;
   firstCard       = null;
   secondCard      = null;
@@ -166,14 +164,16 @@ export function initLevel() {
 // ─── Flip & match logic ───────────────────────────────────────────────────────
 
 function flipCard(card) {
-  if (lockBoard || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  if (lockBoard) return;
+  if (card === firstCard) return;
+  if (card.classList.contains('flipped')) return;
+  if (card.classList.contains('matched')) return;
 
   playFlipSound();
   card.classList.add('flipped');
   levelFlips++;
 
-  if (!hasFlippedCard) {
-    hasFlippedCard = true;
+  if (!firstCard) {
     firstCard = card;
     return;
   }
@@ -189,13 +189,16 @@ function flipCard(card) {
 }
 
 function onMatch() {
+  const card1 = firstCard;
+  const card2 = secondCard;
+
   streak++;
   score += 100 + Math.max(0, streak - 1) * 25;
   scoreDisplay.innerText = score;
   showStreak(streak);
 
-  firstCard.classList.add('matched');
-  secondCard.classList.add('matched');
+  card1.classList.add('matched');
+  card2.classList.add('matched');
 
   matchedPairs++;
   matchDisplay.innerText = matchedPairs;
@@ -203,7 +206,7 @@ function onMatch() {
   saveProgress();
 
   const cr = container.getBoundingClientRect();
-  [firstCard, secondCard].forEach(c => {
+  [card1, card2].forEach(c => {
     const r = c.getBoundingClientRect();
     spawnConfetti(container, r.left - cr.left + r.width / 2, r.top - cr.top + r.height / 2, 14);
   });
@@ -216,18 +219,21 @@ function onMatch() {
 }
 
 function onMiss() {
+  const card1 = firstCard;
+  const card2 = secondCard;
+
   streak = 0;
   showStreak(0);
   playMissSound();
 
-  firstCard.classList.add('shake');
-  secondCard.classList.add('shake');
+  card1.classList.add('shake');
+  card2.classList.add('shake');
 
   setTimeout(() => {
-    firstCard.classList.remove('shake', 'flipped');
-    secondCard.classList.remove('shake', 'flipped');
+    card1.classList.remove('shake', 'flipped');
+    card2.classList.remove('shake', 'flipped');
     resetBoard();
-  }, 600);
+  }, 1000);
 }
 
 function resetBoard() {
